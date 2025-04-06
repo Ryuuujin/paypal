@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - PayPal Clone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/dashboard.css">
+
+  <style>
+    /* Tambahan responsive style */
+    .main-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      padding: 24px;
+    }
+
+    .left-panel {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Responsive form fields */
+    .form-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .form-row > div {
+      flex: 1 1 100%; /* Default 100% on mobile */
+    }
+
+    @media(min-width: 600px) {
+      .form-row > div {
+        flex: 1; /* 3 kolom di tablet ke atas */
+      }
+    }
+
+    .btn-primary {
+      background-color: #0070ba;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .navbar {
+      background-color: #000000;
+      color: white;
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .navbar-center {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .logo-navbar {
+      height: 50px;
+    }
+
+    @media(min-width: 768px) {
+      .navbar {
+        flex-wrap: nowrap;
+      }
+
+      .navbar-center {
+        justify-content: center;
+        margin-top: 0;
+        width: auto;
+        gap: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-left">
+    <img src="PayPal.png" alt="Logo" class="logo-navbar">
+  </div>
+  <div class="navbar-center">
+    <a href="#">Home</a>
+    <a href="#" class="nav-link active">Send</a>
+    <a href="#">Wallet</a>
+    <a href="#">Activity</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main-container">
+
+  <!-- Panel Kiri -->
+  <div class="left-panel">
+
+    <!-- Info Saldo -->
+    <div class="card">
+      <h5>PayPal Balance</h5>
+      <p class="balance" id="balanceDisplay" data-balance="100783673398.23">$100,783,673,398.23</p>
+      <p class="small-text">Available balance</p>
+    </div>
+    
+    
+    <!-- Form Transfer -->
+    <div class="card">
+      <form id="transferForm" action="done.html" method="GET">
+        <div>
+          <label for="penerima">Send Payment To</label><br><br>
+          <input type="text" id="penerima" name="penerima" style="width: 90%; padding: 8px;">
+        </div>
+        <br>
+        <div>
+          <label for="currency">Select Currency</label><br><br>
+          <select id="currency" name="currency" style="width: 99%; padding: 8px;">
+            <option value="USD">USD</option>
+          </select>
+        </div>
+        <br>
+        <div>
+          <label for="amount">Enter Amount</label><br><br>
+          <input type="number" id="amount" name="amount" style="width: 90%; padding: 8px;" min="0">
+        </div>
+      
+        <div style="text-align: center; margin-top: 24px;">
+          <button class="btn-primary" id="sendBtn" type="submit">Send Money</button>
+        </div>
+      </form>
+      
+</div>
+
+
+  </div>
+</div>
+<script>
+  const form = document.getElementById('transferForm');
+  const balanceDisplay = document.getElementById('balanceDisplay');
+  const sendBtn = document.getElementById('sendBtn');
+
+  // Ambil saldo awal dari localStorage atau gunakan default
+  let currentBalance = parseFloat(localStorage.getItem('balance')) || 100783673398.23;
+  updateBalanceDisplay(currentBalance);
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const amountInput = parseFloat(document.getElementById('amount').value) || 0;
+    const penerima = document.getElementById('penerima').value;
+    const currency = document.getElementById('currency').value;
+
+    if (amountInput > currentBalance) {
+      alert("Insufficient balance!");
+      return;
+    }
+
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = "Processing... ⏳";
+
+    // Kurangi saldo dan simpan ke localStorage
+    currentBalance -= amountInput;
+    localStorage.setItem('balance', currentBalance);
+
+    updateBalanceDisplay(currentBalance);
+
+    setTimeout(() => {
+      const url = `done.html?penerima=${encodeURIComponent(penerima)}&currency=${currency}&amount=${amountInput}`;
+      window.location.href = url;
+    }, 2000);
+  });
+
+  function updateBalanceDisplay(balance) {
+    balanceDisplay.dataset.balance = balance;
+    balanceDisplay.textContent = `$${balance.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
+  }
+</script>
+
+
+
+
+  
+</body>
+</html>
